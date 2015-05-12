@@ -12,26 +12,18 @@ public class AppTest {
     @Test
     public void testGetCustomers() throws Exception {
         HttpResponse<String> response = Unirest.get(siteUrl + customersUrl).asString();
-        //System.out.println(Arrays.toString(HttpResponse.class.getMethods()));
         Assert.assertEquals(200, response.getStatus());
         System.out.println(response.getBody());
     }
 
     @Test
     public void testPostCustomers() throws Exception {
-        HttpResponse<String> response = Unirest.post(siteUrl + customersUrl)
-                .body("{}").asString();
-        Assert.assertEquals(405, response.getStatus());
+        // write something to check that 405 METHOD NOT SUPPORTED is returned
+        // for post request to the same URL
     }
 
     @Test
     public void testPutDeleteCustomers() throws Exception {
-        HttpResponse<JsonNode> response = Unirest.put(siteUrl + customersUrl)
-                .body("{\"username\":\"zlopotam\",\"fullname\":\"Zlop Otam\"}").asJson();
-        Assert.assertEquals(200, response.getStatus());
-        int id = response.getBody().getObject().getInt("id");
-        HttpResponse<String> response2 = Unirest.delete(String.format("%s/%s/%d/zlopotam",
-                siteUrl, customersUrl, id)).body("").asString();
-        Assert.assertEquals(200, response.getStatus());
+        // create test for adding a customer and then deleting it
     }
 }
