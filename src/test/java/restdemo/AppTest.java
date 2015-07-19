@@ -1,20 +1,54 @@
 package restdemo;
 
 import java.util.*;
+import java.io.*;
 import org.junit.*;
 import org.json.*;
 import com.mashape.unirest.http.*;
+
+import javax.xml.parsers.*;
+import javax.xml.xpath.*;
+import org.w3c.dom.*;
 
 public class AppTest {
     
     String siteUrl = "http://vfrg.pythonanywhere.com";
     String customersUrl = "/customers/";
+    static final String XML_PATH = "https://gist.githubusercontent.com/RodionGork/8064ab8a648f4be6ff13/raw/2482569baedc06f0d36c2fb54738e66453c3f091/pom.xml";
     
+    DocumentBuilder db;
+    XPath xPath;
+    
+    public AppTest() {
+        try {
+            db = DocumentBuilderFactory.newInstance().newDocumentBuilder();
+            xPath = XPathFactory.newInstance().newXPath();
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    private void testField(Document doc, String path, String value) {
+        try {
+            Assert.assertEquals(value, xPath.evaluate(path, doc.getDocumentElement()));
+        } catch (XPathExpressionException e) {
+            throw new RuntimeException(e);
+        }
+    }
+    
+    @Test
+    public void testGetXml() throws Exception {
+        HttpResponse<String> response = Unirest.get(XML_PATH).asString();
+        Assert.assertEquals(200, response.getStatus());
+        Document doc = db.parse(new ByteArrayInputStream(response.getBody().getBytes("utf-8")));
+        testField(doc, "/project/properties/maven.compiler.target", "1.7");
+    }
+
     @Test
     public void testGetCustomers() throws Exception {
         HttpResponse<String> response = Unirest.get(siteUrl + customersUrl).asString();
         Assert.assertEquals(200, response.getStatus());
-        System.out.println(response.getBody());
+        
     }
 
     @Test
